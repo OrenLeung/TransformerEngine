@@ -3,8 +3,9 @@
 
 #include <hip/hip_runtime.h>
 
-#include <iostream>
 #include <cstdint>
+#include <cstdlib>
+#include <iostream>
 #include <string>
 
 #define CHECK_HIP_ERROR(expr)                                                            \
@@ -35,6 +36,7 @@ void ck_fused_attn_bwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64
                             void *devPtrdK, void *devPtrdV, void *devPtrdO, void *devPtrdBias,
                             void *devPtrCuSeqlensQ, void *devPtrCuSeqlensKV,
                             const std::string &data_type, void *workspace, size_t *workspace_size,
-                            bool deterministic, hipStream_t stream);
+                            bool deterministic, bool ext_asm, bool asm_atomic_fp32,
+                            bool asm_no_coex, bool asm_rtz_cvt, hipStream_t stream);
 
 #endif

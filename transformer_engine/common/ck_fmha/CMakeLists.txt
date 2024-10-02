@@ -90,16 +90,14 @@ target_compile_definitions(ck_fmha_options INTERFACE
 
 # Compiler-specific options
 target_compile_options(ck_fmha_options INTERFACE
-  $<$<CXX_COMPILER_ID:Clang>:
-    -fcolor-diagnostics
-    -fgpu-flush-denormals-to-zero
-    -fno-offload-uniform-block
-    -ftemplate-backtrace-limit=0
-    -fPIC
-    -Wno-float-equal
-    -Wno-gnu-line-marker
-    -Wno-undefined-func-template
-  >
+  -fcolor-diagnostics
+  -fgpu-flush-denormals-to-zero
+  -fno-offload-uniform-block
+  -ftemplate-backtrace-limit=0
+  -fPIC
+  -Wno-float-equal
+  -Wno-gnu-line-marker
+  -Wno-undefined-func-template
 )
 
 set(CK_INCLUDE_DIR "${CK_SRC_DIR}/include")

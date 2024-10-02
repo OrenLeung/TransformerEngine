@@ -100,7 +100,7 @@ void ck_fused_attn_fwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64
         args.rand_val_ptr = nullptr;
         args.lse_ptr      = devPtrSoftmaxStats;
         args.o_ptr        = devPtrO;
-    
+
         args.seqstart_q_ptr = devPtrCuSeqlensQ;
         args.seqstart_k_ptr = devPtrCuSeqlensKV;
         args.seqlen_k_ptr   = nullptr;
