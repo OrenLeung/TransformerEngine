@@ -129,6 +129,7 @@ void nvte_fused_attn_fwd(const NVTETensor Q, const NVTETensor K, const NVTETenso
     const Tensor *input_Bias          = reinterpret_cast<const Tensor *>(Bias);
     Tensor *input_output_S            = reinterpret_cast<Tensor *>(S);
     Tensor *output_O                  = reinterpret_cast<Tensor *>(O);
+    Tensor *wkspace                   = reinterpret_cast<Tensor *>(workspace);
 
     auto ndim   = input_Q->data.shape.size();
     size_t b    = input_cu_seqlens_q->data.shape[0] - 1;
@@ -142,7 +143,7 @@ void nvte_fused_attn_fwd(const NVTETensor Q, const NVTETensor K, const NVTETenso
     fused_attn_rocm::ck_fused_attn_fwd(
         b, h_q, h_kv, max_seqlen_q, max_seqlen_kv, d, is_training, attn_scale, dropout, qkv_layout,
         bias_type, attn_mask_type, input_Q, input_K, input_V, input_Bias, output_O, Aux_CTX_Tensors,
-        input_cu_seqlens_q, input_cu_seqlens_kv, input_rng_state, stream);
+        input_cu_seqlens_q, input_cu_seqlens_kv, input_rng_state, wkspace, stream);
 }
 
 // NVTE fused attention BWD with separate Q, K and V

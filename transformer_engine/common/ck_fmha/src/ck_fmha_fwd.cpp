@@ -12,7 +12,8 @@ void ck_fused_attn_fwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64
                             uint32_t bias_type, uint32_t mask_type, void *devPtrQ, void *devPtrK,
                             void *devPtrV, void *devPtrBias, void *devPtrSoftmaxStats,
                             void *devPtrO, void *devPtrCuSeqlensQ, void *devPtrCuSeqlensKV,
-                            const std::string &data_type, hipStream_t stream) {
+                            const std::string &data_type, void *workspace, size_t *workspace_size,
+                            hipStream_t stream) {
     /* CK input parameters */
     ck_tile::index_t batch          = b;
     ck_tile::index_t seqlen_q       = s_q;
@@ -53,6 +54,12 @@ void ck_fused_attn_fwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64
         window_size_right = 0;
     } else {
         throw std::runtime_error("Unsupported mask type");
+    }
+
+    if (workspace == nullptr) {
+        // CK FMHA FWD does not require any additional workspace memory
+        *workspace_size = 0;
+        return;
     }
 
     const auto init_traits = [&](auto &traits) {

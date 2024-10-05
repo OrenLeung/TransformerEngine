@@ -25,7 +25,8 @@ void ck_fused_attn_fwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64
                             uint32_t bias_type, uint32_t mask_type, void *devPtrQ, void *devPtrK,
                             void *devPtrV, void *devPtrBias, void *devPtrSoftmaxStats,
                             void *devPtrO, void *devPtrCuSeqlensQ, void *devPtrCuSeqlensKV,
-                            const std::string &data_type, hipStream_t stream);
+                            const std::string &data_type, void *workspace, size_t *workspace_size,
+                            hipStream_t stream);
 
 void ck_fused_attn_bwd_impl(int64_t b, int64_t h, int64_t hg, int64_t s_q, int64_t s_kv, int64_t d,
                             int64_t bias_b, int64_t bias_h, float scaling_factor,

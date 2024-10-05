@@ -21,7 +21,7 @@ void ck_fused_attn_fwd(size_t batch, size_t num_attn_heads, size_t num_gqa_group
                        const Tensor *input_K, const Tensor *input_V, const Tensor *input_Bias,
                        Tensor *output_O, NVTETensorPack *Aux_CTX_Tensors,
                        const Tensor *cu_seqlens_q, const Tensor *cu_seqlens_kv,
-                       const Tensor *rng_state, cudaStream_t stream) {
+                       const Tensor *rng_state, Tensor *workspace, cudaStream_t stream) {
     const auto QKV_type     = input_Q->data.dtype;
     void *devPtrQ           = input_Q->data.dptr;
     void *devPtrK           = input_K->data.dptr;
@@ -86,6 +86,8 @@ void ck_fused_attn_fwd(size_t batch, size_t num_attn_heads, size_t num_gqa_group
         NVTE_ERROR("Unexpected Aux_CTX_Tensors->size");
     }
 
+    size_t workspace_size = 0;
+
     uint64_t drop_seed   = 0;
     uint64_t drop_offset = 0;
     if (p_dropout > 0) {
@@ -104,7 +106,22 @@ void ck_fused_attn_fwd(size_t batch, size_t num_attn_heads, size_t num_gqa_group
                            head_dim, bias_b, bias_h, is_training, attn_scale, p_dropout, drop_seed,
                            drop_offset, attn_bias_type, attn_mask_type, devPtrQ, devPtrK, devPtrV,
                            devPtrBias, devPtrS, devPtrO, devPtrCuSeqlensQ, devPtrCuSeqlensKV,
-                           get_datatype_str(QKV_type), stream);
+                           get_datatype_str(QKV_type), &workspace->data.dptr, &workspace_size,
+                           stream);
+
+    if (workspace_size > 0) {
+        if (workspace->data.dptr == nullptr) {
+            workspace->data.shape = {workspace_size};
+            workspace->data.dtype = DType::kByte;
+            return;
+        }
+    } else if (workspace_size == 0) {
+        workspace->data.shape = {1};
+        workspace->data.dtype = DType::kByte;
+        return;
+    } else {
+        NVTE_ERROR("Unexpected workspace_size");
+    }
 }
 
 void ck_fused_attn_bwd(size_t batch, size_t num_attn_heads, size_t num_gqa_groups,
